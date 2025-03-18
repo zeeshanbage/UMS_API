@@ -7,9 +7,16 @@
     {
         public static void MapAdminEndpoints(this WebApplication app)
         {
-            app.MapPost("/InsertCourse", async (CourseService courseService, CourseRequest course) =>
+            app.MapPost("/SaveCourse", async (CourseService courseService, CourseRequest course) =>
             {
-                return await courseService.InsertCourse(course);
+                if (course.CourseId == 0)
+                {
+                    return await courseService.InsertCourse(course);
+                }
+                else
+                {
+                    return await courseService.UpdateCourse(course);
+                }
             })
             .WithOpenApi()
             .WithTags("Admin");
@@ -41,20 +48,6 @@
             })
             .WithOpenApi()
             .WithTags("Admin");
-
-            //app.MapPost("/InsertDynamicForm", async (CourseService courseService, DynamicForm dynamicForm) =>
-            //{
-            //    return await courseService.InsertDynamicForm(dynamicForm);
-            //})
-            //.WithOpenApi()
-            //.WithTags("Admin");
-
-            //app.MapPost("/DeleteDynamicForm", async (CourseService courseService, int formId) =>
-            //{
-            //    return await courseService.DeleteDynamicForm(formId);
-            //})
-            //.WithOpenApi()
-            //.WithTags("Admin");
         }
     }
 }

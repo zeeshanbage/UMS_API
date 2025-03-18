@@ -26,10 +26,10 @@ public static class MobileEndpoints
 
         app.MapGet("/GetApplications", async (CourseService courseService, int academicYearId=0, int parentCourseId = 0) =>
         {
-            if (academicYearId == 0 || parentCourseId==0)
-            {
-                return await courseService.GetApplications();
-            }
+            //if (academicYearId == 0 || parentCourseId==0)
+            //{
+            //    return await courseService.GetApplications();
+            //}
 
             return await courseService.GetApplicationsById(academicYearId, parentCourseId);
         })

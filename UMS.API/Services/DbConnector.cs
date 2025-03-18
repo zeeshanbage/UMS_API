@@ -11,18 +11,21 @@
     public class DbConnector
     {
         private readonly IConnectionProvider _connectionProvider;
-        private readonly string _connectionString;
+        private readonly string ConnectionString;
 
         public DbConnector(IConnectionProvider connectionProvider, IConfiguration configuration)
         {
+
             _connectionProvider = connectionProvider;
-            _connectionString = configuration["ConnectionStrings:DefaultConnection"];
+            var conString = configuration.GetConnectionString("DefaultConnection");
+            var password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
+            ConnectionString = conString.Replace("{PasswordPlaceholder}", password);
         }
 
         public async Task<IEnumerable<T>> QueryMultipleRows<T>(string query, object parameters = null)
         {
             IEnumerable<T> resultSet;
-            using (var connection = _connectionProvider.CreateConnection(_connectionString))
+            using (var connection = _connectionProvider.CreateConnection(ConnectionString))
             {
                 var reader = await connection.QueryMultipleAsync(query, parameters);
                 resultSet = reader != null ? await reader.ReadAsync<T>() : null;
@@ -30,28 +33,9 @@
             }
         }
 
-        public async Task<T> QueryFirstOrDefaultAsync<T>(string query, object parameters = null)
-        {
-            using (var connection = _connectionProvider.CreateConnection(_connectionString))
-            {
-                try
-                {
-                    T resultSet;
-                    var reader = await connection.QueryFirstOrDefaultAsync(query, parameters);
-                    resultSet = reader != null ? await reader.ReadAsync<T>() : null;
-                    return resultSet;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error executing query: {ex.Message}");
-                    throw;
-                }
-            }
-        }
-
         public async Task<T> ExecuteScalarAsync<T>(string query, object parameters = null)
         {
-            using (var connection = _connectionProvider.CreateConnection(_connectionString))
+            using (var connection = _connectionProvider.CreateConnection(ConnectionString))
             {
                 return await connection.ExecuteScalarAsync<T>(query, parameters);
             }
@@ -59,7 +43,7 @@
 
         public async Task<int> ExecuteAsync(string query, object parameters)
         {
-            using (var connection = _connectionProvider.CreateConnection(_connectionString))
+            using (var connection = _connectionProvider.CreateConnection(ConnectionString))
             {
                 return await connection.ExecuteAsync(query, parameters);
             }

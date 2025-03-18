@@ -15,6 +15,7 @@ public class CourseService
         _dbConnector = dbConnector;
     }
 
+    #region Course
     public async Task<List<Course>> GetCourses()
     {
         // Query to fetch all courses and academic years
@@ -75,7 +76,7 @@ public class CourseService
         DELETE FROM public.AcademicYear
         WHERE CourseId=@CourseId";
 
-        var academicYearParams =new
+        var academicYearParams = new
         {
             CourseId = courseId
         };
@@ -95,11 +96,19 @@ public class CourseService
         return rowCount;
     }
 
+    internal async Task<int> UpdateCourse(CourseRequest course)
+    {
+        await DeleteCourse(course.CourseId);
+        return await InsertCourse(course);
+    }
+    #endregion
+
+    #region Application
     public async Task<int> InsertApplication(Application application)
     {
         const string query = @"
-        INSERT INTO public.Applications (subtitle, name, academicYearId, courseId, imageUrl)
-        VALUES (@Subtitle, @Name, @AcademicYearId, @CourseId, @ImageUrl)
+        INSERT INTO public.Applications (subtitle, name, academicYearId, courseId, imageUrl, Documents, textInputFields, dropDownFields)
+        VALUES (@Subtitle, @Name, @AcademicYearId, @CourseId, @ImageUrl, @Documents, @TextInputFields, @DropDownFields)
         RETURNING ApplicationId";
 
         var parameters = new
@@ -109,6 +118,9 @@ public class CourseService
             application.AcademicYearId,
             application.CourseId,
             application.ImageUrl,
+            application.Documents,
+            application.TextInputFields,
+            application.DropDownFields
         };
         return await _dbConnector.ExecuteScalarAsync<int>(query, parameters);
     }
@@ -130,7 +142,7 @@ public class CourseService
     {
         // Query to fetch all courses and academic years
         string query = @"
-        SELECT a.*
+        SELECT a.*,
         c.Title AS CourseTitle,
         ay.Title AS AcademicYearTitle
         FROM public.applications a 
@@ -158,8 +170,8 @@ public class CourseService
             ON c.CourseId = a.CourseId
         LEFT JOIN public.AcademicYear ay
             ON ay.academicyearId= a.academicyearId
-        WHERE a.CourseId=@CourseId
-        AND a.AcademicYearId=@AcademicYearId";
+        WHERE (@CourseId!=0 AND a.CourseId=@CourseId)
+        AND (@AcademicYearId!=0 AND a.AcademicYearId=@AcademicYearId);";
 
         var parameters = new { AcademicYearId = academicYearId, CourseId = courseId };
 
@@ -178,7 +190,10 @@ public class CourseService
             name = @Name,
             academicYearId = @AcademicYearId,
             courseId = @CourseId,
-            imageUrl = @ImageUrl
+            imageUrl = @ImageUrl,
+            Documents = @Documents,
+            textInputFields = @TextInputFields,
+            dropDownFields = @DropDownFields
         WHERE applicationId = @ApplicationId;";
 
         var parameters = new
@@ -188,11 +203,16 @@ public class CourseService
             application.AcademicYearId,
             application.CourseId,
             application.ImageUrl,
-            application.ApplicationId // Assuming ApplicationId is a property in the Application class
+            application.ApplicationId,
+            application.Documents,
+            application.TextInputFields,
+            application.DropDownFields
+            // Assuming ApplicationId is a property in the Application class
         };
 
         return await _dbConnector.ExecuteAsync(query, parameters);
-    }
+    } 
+    #endregion
 
 
     #region NotRequired Now
@@ -247,7 +267,8 @@ public class CourseService
 
         var result = await _dbConnector.QueryMultipleRows<DynamicForm>(query, parameters);
         return result.FirstOrDefault();
-    } 
+    }
+
     #endregion
 
 }
