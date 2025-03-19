@@ -170,8 +170,8 @@ public class CourseService
             ON c.CourseId = a.CourseId
         LEFT JOIN public.AcademicYear ay
             ON ay.academicyearId= a.academicyearId
-        WHERE (@CourseId!=0 AND a.CourseId=@CourseId)
-        AND (@AcademicYearId!=0 AND a.AcademicYearId=@AcademicYearId);";
+        WHERE (@CourseId=0 OR a.CourseId=@CourseId)
+        AND (@AcademicYearId=0 OR a.AcademicYearId=@AcademicYearId);";
 
         var parameters = new { AcademicYearId = academicYearId, CourseId = courseId };
 
