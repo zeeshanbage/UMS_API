@@ -36,11 +36,10 @@ var app = builder.Build();
 app.UseCors("AllowReactApp");
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
@@ -49,7 +48,5 @@ app.MapMobileEndpoints();
 app.MapAdminEndpoints();
 
 
-app.UseStaticFiles();
-app.MapFallbackToFile("index.html");
 
 app.Run();
