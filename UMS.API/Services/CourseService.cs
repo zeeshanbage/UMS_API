@@ -32,7 +32,8 @@ public class CourseService
         LEFT JOIN 
             AcademicYear ay
         ON 
-            c.CourseId = ay.CourseId;";
+            c.CourseId = ay.CourseId
+        ORDER BY c.CourseId DESC;";
 
         // Execute the query and fetch dynamic results
         var result = await _dbConnector.QueryMultipleRows<Course>(query);
@@ -171,7 +172,8 @@ public class CourseService
         LEFT JOIN public.AcademicYear ay
             ON ay.academicyearId= a.academicyearId
         WHERE (@CourseId=0 OR a.CourseId=@CourseId)
-        AND (@AcademicYearId=0 OR a.AcademicYearId=@AcademicYearId);";
+        AND (@AcademicYearId=0 OR a.AcademicYearId=@AcademicYearId)
+        order by a.applicationId DESC";
 
         var parameters = new { AcademicYearId = academicYearId, CourseId = courseId };
 
