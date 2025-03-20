@@ -60,21 +60,15 @@ jobs:
         run: |
           cd ./UMS.API/UMS_Client
           npm run build
-          
-          # Create and clean wwwroot directory
           mkdir -p ../wwwroot
           rm -rf ../wwwroot/*
           cp -r dist/* ../wwwroot/
 
-      - name: Verify wwwroot contents
-        run: ls -la ./UMS.API/wwwroot
-
       - name: Upload frontend artifact
-        working-directory: ./UMS.API/wwwroot
         uses: actions/upload-artifact@v4
         with:
           name: frontend-artifact
-          path: .
+          path: ./UMS.API/wwwroot
 
   deploy:
     runs-on: ubuntu-latest
@@ -93,18 +87,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: backend-artifact
+          path: backend-artifact
 
       - name: Download frontend artifact
         uses: actions/download-artifact@v4
         with:
           name: frontend-artifact
-
-      - name: Verify downloaded artifacts
-        run: |
-          echo "Backend artifact contents:"
-          ls -la backend-artifact
-          echo "Frontend artifact contents:"
-          ls -la frontend-artifact
+          path: frontend-artifact
 
       - name: Merge artifacts
         run: |
@@ -115,13 +104,13 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_4CA782253EE548598EFB173F31609B4E }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_0634251C4FA84774A0D0C6C6C2275AF6 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C40329A861514D23B6C6E328FD670D5D }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'umsbackend'
           slot-name: 'Production'
-          package: backend-artifact
+          package: backend
