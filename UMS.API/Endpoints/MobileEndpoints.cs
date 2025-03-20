@@ -8,7 +8,11 @@ public static class MobileEndpoints
     public static void MapMobileEndpoints(this WebApplication app)
     {
         #region EndPoints
-        app.MapGet("/generate-presigned-url", (string pathToFile) =>
+
+        // Group all routes under the '/api' prefix
+        var mobileGroup = app.MapGroup("/api");
+
+        mobileGroup.MapGet("/generate-presigned-url", (string pathToFile) =>
         {
             var url = R2Connector.GetSignedUrl(pathToFile);
             return url;
@@ -16,7 +20,7 @@ public static class MobileEndpoints
         .WithOpenApi()
         .WithTags("Mobile");
 
-        app.MapGet("/GetCourses", async (CourseService courseService) =>
+        mobileGroup.MapGet("/GetCourses", async (CourseService courseService) =>
         {
             var result = await courseService.GetCourses();
             return ConvertCoursesResult(result);
@@ -24,19 +28,14 @@ public static class MobileEndpoints
         .WithOpenApi()
         .WithTags("Mobile");
 
-        app.MapGet("/GetApplications", async (CourseService courseService, int academicYearId=0, int parentCourseId = 0) =>
+        mobileGroup.MapGet("/GetApplications", async (CourseService courseService, int academicYearId = 0, int parentCourseId = 0) =>
         {
-            //if (academicYearId == 0 || parentCourseId==0)
-            //{
-            //    return await courseService.GetApplications();
-            //}
-
             return await courseService.GetApplicationsById(academicYearId, parentCourseId);
         })
         .WithOpenApi()
         .WithTags("Mobile");
 
-        app.MapGet("/GetDynamicForm", async (CourseService courseService, int applicationId) =>
+        mobileGroup.MapGet("/GetDynamicForm", async (CourseService courseService, int applicationId) =>
         {
             return await courseService.GetDynamicForm(applicationId);
         })
@@ -65,7 +64,7 @@ public static class MobileEndpoints
                                 }).ToList()
                             });
             return courses;
-        } 
+        }
         #endregion
     }
 }
