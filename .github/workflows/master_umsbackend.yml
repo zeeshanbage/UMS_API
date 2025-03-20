@@ -24,8 +24,6 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        env:
-          POSTGRES_PASSWORD: ${{ secrets.MY_SECRET_PASSWORD }}
         run: dotnet build ./UMS.Backend.sln --configuration Release
 
       - name: dotnet publish
@@ -63,6 +61,8 @@ jobs:
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.MY_SECRET_PASSWORD }}
         with:
           app-name: 'umsbackend'
           slot-name: 'Production'
