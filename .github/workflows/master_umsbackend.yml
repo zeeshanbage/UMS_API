@@ -52,7 +52,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd UMS_Project/UMS_Web/UMS.API/UMS_Client
+          cd ./UMS.API/UMS_Client
           npm install
 
       - name: Set environment variable for API base URL
@@ -60,14 +60,14 @@ jobs:
 
       - name: Build React app
         run: |
-          cd UMS_Project/UMS_Web/UMS.API/UMS_Client
+          cd ./UMS.API/UMS_Client
           npm run build
 
       - name: Upload artifact for frontend deployment
         uses: actions/upload-artifact@v4
         with:
           name: frontend-artifact
-          path: UMS_Project/UMS_Web/UMS.API/UMS_Client/dist
+          path: ./UMS.API/UMS_Client/dist
 
   deploy:
     runs-on: ubuntu-latest
