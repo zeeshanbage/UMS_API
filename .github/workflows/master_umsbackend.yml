@@ -115,6 +115,6 @@ jobs:
         env:
           VITE_API_BASE_URL: 'https://umsbackend.azurewebsites.net/api'
         with:
-          app-name: 'umsfrontend'
+          app-name: 'umsbackend'
           slot-name: 'Production'
-          package: UMS_Project/UMS_Web/UMS.API/UMS_Client/dist
+          package: ./UMS_Client/dist
