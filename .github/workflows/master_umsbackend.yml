@@ -15,14 +15,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Create wwwroot directory
+        run: mkdir -p ./UMS.API/wwwroot
+
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
-
-      # Create wwwroot directory if it doesn't exist
-      - name: Create wwwroot directory
-        run: mkdir -p ./UMS.API/wwwroot
 
       - name: Build with dotnet
         run: dotnet build ./UMS.Backend.sln --configuration Release
@@ -47,7 +46,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'  # Recommended to use LTS version
+          node-version: '18.x'
 
       - name: Install dependencies
         run: |
@@ -61,7 +60,9 @@ jobs:
         run: |
           cd ./UMS.API/UMS_Client
           npm run build
-          # Copy build output to wwwroot folder
+          
+          # Create and clean wwwroot directory
+          mkdir -p ../wwwroot
           rm -rf ../wwwroot/*
           cp -r dist/* ../wwwroot/
 
@@ -94,10 +95,11 @@ jobs:
         with:
           name: frontend-artifact
 
-      # Move frontend files to backend's wwwroot
       - name: Merge artifacts
         run: |
-          mv frontend-artifact/* backend-artifact/wwwroot/
+          # Move frontend files to backend's wwwroot
+          mkdir -p backend-artifact/wwwroot
+          cp -r frontend-artifact/* backend-artifact/wwwroot/
           rm -rf frontend-artifact
 
       - name: Login to Azure
