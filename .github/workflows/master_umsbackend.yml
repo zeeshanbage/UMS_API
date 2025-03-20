@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy ASP.Net Core backend and React frontend to Azure Web App
 
 on:
@@ -13,17 +10,19 @@ jobs:
   build-backend:
     runs-on: ubuntu-latest
     permissions:
-      contents: read # This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
-        env:
-          POSTGRES_PASSWORD: ${{ secrets.MY_SECRET_PASSWORD }}
         with:
           dotnet-version: '8.x'
+
+      # Create wwwroot directory if it doesn't exist
+      - name: Create wwwroot directory
+        run: mkdir -p ./UMS.API/wwwroot
 
       - name: Build with dotnet
         run: dotnet build ./UMS.Backend.sln --configuration Release
@@ -48,7 +47,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '23.x'
+          node-version: '18.x'  # Recommended to use LTS version
 
       - name: Install dependencies
         run: |
@@ -56,18 +55,21 @@ jobs:
           npm install
 
       - name: Set environment variable for API base URL
-        run: echo "VITE_API_BASE_URL=https://umsbackend.azurewebsites.net/api" >> .env
+        run: echo "VITE_API_BASE_URL=https://umsbackend.azurewebsites.net/api" >> ./UMS.API/UMS_Client/.env
 
       - name: Build React app
         run: |
           cd ./UMS.API/UMS_Client
           npm run build
+          # Copy build output to wwwroot folder
+          rm -rf ../wwwroot/*
+          cp -r dist/* ../wwwroot/
 
-      - name: Upload artifact for frontend deployment
+      - name: Upload frontend artifact
         uses: actions/upload-artifact@v4
         with:
           name: frontend-artifact
-          path: ./UMS.API/UMS_Client/dist
+          path: ./UMS.API/wwwroot
 
   deploy:
     runs-on: ubuntu-latest
@@ -78,19 +80,25 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write # This is required for requesting the JWT
-      contents: read # This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
-      - name: Download backend artifact from build job
+      - name: Download backend artifact
         uses: actions/download-artifact@v4
         with:
           name: backend-artifact
 
-      - name: Download frontend artifact from build job
+      - name: Download frontend artifact
         uses: actions/download-artifact@v4
         with:
           name: frontend-artifact
+
+      # Move frontend files to backend's wwwroot
+      - name: Merge artifacts
+        run: |
+          mv frontend-artifact/* backend-artifact/wwwroot/
+          rm -rf frontend-artifact
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -99,22 +107,9 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_0634251C4FA84774A0D0C6C6C2275AF6 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C40329A861514D23B6C6E328FD670D5D }}
 
-      - name: Deploy backend to Azure Web App
-        id: deploy-backend
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
-        env:
-          POSTGRES_PASSWORD: ${{ secrets.MY_SECRET_PASSWORD }}
         with:
           app-name: 'umsbackend'
           slot-name: 'Production'
-          package: .
-
-      - name: Deploy frontend to Azure Web App
-        id: deploy-frontend
-        uses: azure/webapps-deploy@v3
-        env:
-          VITE_API_BASE_URL: 'https://umsbackend.azurewebsites.net/api'
-        with:
-          app-name: 'umsbackend'
-          slot-name: 'Production'
-          package: .
+          package: backend-artifact
