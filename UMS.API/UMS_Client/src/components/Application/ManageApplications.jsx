@@ -1,17 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { Input, Button, Typography, Space, Select, message, Checkbox } from "antd";
+import { Upload, Input, Button, Typography, Space, Select, message, Checkbox, Alert } from "antd";
 
-import { insertApplication, getCourses } from "../../services/courseService";
+import { insertApplication, getCourses, deleteApplication } from "../../services/courseService";
 import DocumentsInput from "./DocumentsInput";
 import TextInputFields from "./TextInputFields";
-import DropdownInputFields from "./DropdownInputFields";
+import { InboxOutlined, UploadOutlined } from '@ant-design/icons';
+import { uploadFile, deleteFile } from "../../services/supabaseClient";
 
-const { Title, Text } = Typography;
-const { Option } = Select;
+const { Dragger } = Upload;
+const { Text, Title } = Typography;
 
-const ManageApplications = ({ initialApplication }) => {
+const initialApplicationState = {
+    name: '',
+    subtitle: '',
+    courseId: 0,
+    academicYearId: 0,
+    imageUrl: '',
+    TextInputFields: '',
+    Documents: '',
+};
+
+const ManageApplications = ({ initialApplication = initialApplicationState }) => {
     const [courseDropdown, setCourseDropdown] = useState([]);
     const [yearDropdown, setYearDropdown] = useState([]);
+    const [showError, setShowError] = useState(false);
     const [application, setApplication] = useState(initialApplication);
 
     // Fetch courses and populate the dropdown
@@ -26,7 +38,6 @@ const ManageApplications = ({ initialApplication }) => {
             setCourseDropdown(dropdownItems);
         } catch (error) {
             console.error("Error fetching courses:", error);
-            message.error("Failed to fetch courses.");
         }
     };
 
@@ -34,8 +45,14 @@ const ManageApplications = ({ initialApplication }) => {
         fetchCourses();
     }, []);
 
+    // Update application state when initialApplication changes
+    useEffect(() => {
+        setApplication(initialApplication);
+    }, [initialApplication]);
+
     // Handle course selection
     const handleCourseChange = (courseId) => {
+        setShowError(false);
         const selectedCourse = courseDropdown.find((course) => course.value === courseId);
         const academicYears = selectedCourse?.academicYears || [];
         setYearDropdown(
@@ -66,16 +83,55 @@ const ManageApplications = ({ initialApplication }) => {
             [field]: jsonValue,
         }));
     }
-    
+
     // Insert application
     const handleInsertApplication = async () => {
         try {
+            if (application.name === '' || application.courseId === 0 || application.academicYearId === 0) {
+                setShowError(true);
+                return;
+            }
+            if(application.applicationId > 0)
+            {
+                console.log('Deleting existing application first', application.applicationId)
+                await deleteApplication(application.applicationId)
+            }
             const response = await insertApplication(application);
-            message.success(`Application inserted with ID: ${response.data}`);
+            setApplication(initialApplicationState); // Reset the form
+            message.success('Application inserted successfully.');
         } catch (error) {
             console.error("Error inserting application:", error);
-            message.error("Failed to save the application.");
+            message.error('Failed to insert application.');
         }
+    };
+
+    const uploadProps = {
+        name: 'file',
+        multiple: false,
+        maxCount: 1,
+        listType: "picture",
+        customRequest: async ({ file, onSuccess, onError }) => {
+            try {
+                const imageUrl = await uploadFile(file);
+                console.log('uploaded image url ', imageUrl);
+                setApplication({ ...application, imageUrl: imageUrl });
+                onSuccess('ok');
+            } catch (error) {
+                onError(error);
+            }
+        },
+        onChange(info) {
+            const { status } = info.file;
+            if (status === 'done') {
+                console.log(`${info.file.name} file uploaded successfully.`);
+            } else if (status === 'error') {
+                console.log(`${info.file.name} file upload failed.`);
+            }
+        },
+
+        onRemove: async (file) => {
+            await deleteFile(file);
+        },
     };
 
     return (
@@ -91,7 +147,7 @@ const ManageApplications = ({ initialApplication }) => {
                             placeholder="Choose a course"
                             options={courseDropdown}
                             onChange={handleCourseChange}
-                            value={application.courseId || undefined}
+                            value={application.courseId}
                         />
                     </div>
                     <div style={{ flex: 1 }}>
@@ -101,7 +157,7 @@ const ManageApplications = ({ initialApplication }) => {
                             placeholder="Choose a year"
                             options={yearDropdown}
                             onChange={handleYearChange}
-                            value={application.academicYearId || undefined}
+                            value={application.academicYearId}
                             disabled={yearDropdown.length === 0} // Disable if no years are available
                         />
                     </div>
@@ -112,6 +168,7 @@ const ManageApplications = ({ initialApplication }) => {
                     <Text strong>Application Name</Text>
                     <Input
                         value={application.name}
+                        placeholder="Addmission Form, Exam Form, Notes etc"
                         onChange={(e) => setApplication({ ...application, name: e.target.value })}
                     />
                 </div>
@@ -119,26 +176,42 @@ const ManageApplications = ({ initialApplication }) => {
                     <Text strong>Application Subtitle</Text>
                     <Input
                         value={application.subtitle}
+                        placeholder="Fees = 1000rs, Last Date 10 Mar etc"
                         onChange={(e) => setApplication({ ...application, subtitle: e.target.value })}
                     />
                 </div>
                 <div>
-                    <Text strong>Image URL</Text>
-                    <Input
-                        value={application.imageUrl}
-                        onChange={(e) => setApplication({ ...application, imageUrl: e.target.value })}
-                    />
+                    <Text strong>Image</Text>
+                    <Dragger {...uploadProps}>
+                        <p className="ant-upload-drag-icon">
+                            <InboxOutlined />
+                        </p>
+                        <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                        <p className="ant-upload-hint">
+                            Please upload only image, size should be small.
+                        </p>
+                    </Dragger>
+                    <Text italic>{application.imageURL}</Text>
                 </div>
-                <div>
-                    <DocumentsInput setDocumentValue={handleDynamicFormInput}/>
+                <div style={{ border: '1px solid #d9d9d9', padding: '0.5rem', borderRadius: '10px' }}>
+                    <DocumentsInput setDocumentValue={handleDynamicFormInput} />
                 </div>
-                <div>
-                    <TextInputFields setInputFieldsValue={handleDynamicFormInput}/>
+                <div style={{ border: '1px solid #d9d9d9', padding: '0.5rem', borderRadius: '10px' }}>
+                    <TextInputFields setInputFieldsValue={handleDynamicFormInput} />
                 </div>
                 <div>
                     {/* <DropdownInputFields setDropdownValue={handleDynamicFormInput}/> */}
                 </div>
-
+                <div>
+                    {showError && (<Alert
+                        message="Error"
+                        description="Enter Name, Select course and Year"
+                        type="error"
+                        showIcon
+                        closable
+                        afterClose={() => setShowError(false)}
+                    />)}
+                </div>
                 {/* Save Button */}
                 <Button type="primary" onClick={handleInsertApplication}>
                     Save Application

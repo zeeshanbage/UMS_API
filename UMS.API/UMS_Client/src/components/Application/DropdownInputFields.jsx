@@ -51,7 +51,7 @@ function DropdownInputFields({ setDropdownValue }) {
                     </Button>
                 </Space>
             ))}
-            <Button type="primary" ghost onClick={addTextField} style={{ width: '100%', padding:'10px' }}>
+            <Button type="primary" onClick={addTextField} style={{ width: '100%', padding:'10px' }}>
                 Add More
             </Button>
         </>

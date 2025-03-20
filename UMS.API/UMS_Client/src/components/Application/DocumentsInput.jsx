@@ -42,11 +42,12 @@ function DocumentsInput({ setDocumentValue }) {
 
     return (
         <>
-            <Text strong>Documents</Text>
+            <Text strong>Documents required to fill this Form</Text>
             {documentsInput.map((doc, index) => (
-                <Space key={index} align="baseline" style={{ width: '100%', margin:'10px' }}>
-                    <Text style={{}}>Doc {index+1} </Text>
+                <Space key={index} align="baseline" style={{ width: '100%', margin:'10px', flexWrap:'wrap' }}>
+                    <Text style={{}}>Document Name </Text>
                     <Input
+                        placeholder="adharCard, Result etc"
                         value={doc.name}
                         onChange={(e) => handleDocumentInputChange(index, 'name', e.target.value)}
                     />
@@ -57,7 +58,7 @@ function DocumentsInput({ setDocumentValue }) {
                     </Button>
                 </Space>
             ))}
-            <Button type="primary" ghost onClick={addDocument} style={{ width: '100%', padding:'10px' }}>
+            <Button type="primary" onClick={addDocument} style={{ width: '100%', padding:'10px' }}>
                 Add More
             </Button>
         </>

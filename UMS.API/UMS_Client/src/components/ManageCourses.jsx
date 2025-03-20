@@ -38,10 +38,9 @@ const ManageCourses = ({iniCourse}) => {
   const handleInsertCourse = async () => {
     try {
       await insertCourse(course);
-      message.success('Course inserted successfully!');
       setCourse({ title: '', subtitle: '', imageUrl: '', academicYears: [] });
     } catch (error) {
-      message.error('Failed to insert course!');
+      console.log('Failed to insert course!');
     }
   };
 
