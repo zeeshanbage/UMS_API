@@ -4,7 +4,7 @@ using UMS.API.Services;
 var options = new WebApplicationOptions
 {
     ContentRootPath = AppContext.BaseDirectory,
-    WebRootPath = "UMS_Client/dist" // Set your React app's build directory as the web root
+    WebRootPath = "wwwroot" // Changed to match the deployment folder
 };
 
 var builder = WebApplication.CreateBuilder(options);
@@ -16,34 +16,36 @@ builder.Services.AddSingleton<IConnectionProvider, NpgsqlConnectionProvider>();
 builder.Services.AddSingleton<DbConnector>();
 builder.Services.AddTransient<CourseService>();
 
-// Add CORS policy
+// Configure CORS for development and production
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp", policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:3001",
-                        "https://umsbackend.azurewebsites.net") // React App's local development URL
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowAnyMethod();
     });
 });
 
 var app = builder.Build();
 
-// Use CORS middleware before other middleware like routing
-app.UseCors("AllowReactApp");
-
+// Configure the HTTP request pipeline
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
-app.UseStaticFiles(); // Enable serving static files (React app)
 
-app.MapMobileEndpoints(); // Map your API endpoints
-app.MapAdminEndpoints(); // Map your admin API endpoints
+// Serve static files first
+app.UseStaticFiles(); // Serves files from wwwroot
 
-// Catch-all route to serve React frontend
+// Enable CORS before routing
+app.UseCors("AllowAll");
+
+// API Endpoints
+app.MapMobileEndpoints();
+app.MapAdminEndpoints();
+
+// Handle client-side routing for React
 app.MapFallbackToFile("index.html");
 
 app.Run();
