@@ -135,7 +135,7 @@ const ManageApplications = ({ initialApplication = initialApplicationState }) =>
     };
 
     return (
-        <div style={{ marginBottom: "24px", padding: "16px", border: "1px solid #f0f0f0", borderRadius: "8px" }}>
+        <div style={{ marginBottom: "24px", padding: "0.5rem", border: "1px solid #f0f0f0", borderRadius: "8px" }}>
             <Title level={3}>Create Application</Title>
             <Space direction="vertical" style={{ width: "100%" }} size="large">
                 {/* Course and Year Dropdowns */}

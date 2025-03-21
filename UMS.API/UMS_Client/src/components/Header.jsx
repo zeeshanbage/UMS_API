@@ -6,7 +6,7 @@ const { Header } = Layout;
 
 const items = [
     { key: '1', label: 'Courses' },
-    { key: '2', label: 'Applications/Forms' }
+    { key: '2', label: 'Forms' }
 ];
 
 function UMSHeader() {
@@ -36,7 +36,7 @@ function UMSHeader() {
     }
 
     return (
-        <div style={{ marginBottom: '10px' }}>
+        <div style={{ marginBottom: '0.5rem' }}>
             <Header
                 style={{
                     position: 'sticky',
@@ -44,10 +44,12 @@ function UMSHeader() {
                     zIndex: 1,
                     width: '100%',
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
+                    marginInline:'0.5rem',
+                    borderRadius: '0.5rem',
                 }}
             >
-                <span style={{ color: 'white', marginRight: '24px' }}>
+                <span style={{ color: 'white', marginRight: '1.5rem', flexWrap:'wrap' }}>
                     Umar Multi Services
                 </span>
                 <Menu
@@ -55,7 +57,7 @@ function UMSHeader() {
                     mode="horizontal"
                     selectedKeys={[selectedKey]} // Use selectedKeys instead of defaultSelectedKeys
                     items={items}
-                    style={{ flex: 1, minWidth: 0 }}
+                    style={{ flex: 1, minWidth: '30px', right:'10px' }}
                     onSelect={onSelectItem}
                 />
             </Header>
