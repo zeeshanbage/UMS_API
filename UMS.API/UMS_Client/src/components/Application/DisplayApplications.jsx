@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { getApplications, deleteApplication} from '../../services/courseService';
-import { Table, Typography, Space, Button } from 'antd';
+import { Table, Typography, Space, Button, Skeleton } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
 const DisplayApplications = ({ handleApplicationEdit }) => {
   const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true); // Add loading state
+  
 
   const fetchApplications = async () => {
     try {
+      setLoading(true);
       const response = await getApplications(); 
+      setLoading(false);
       setApplications(response.data);
     } catch (error) {
       console.error('Error fetching applications:', error);
+      setLoading(false);
     }
   };
 
@@ -29,6 +34,7 @@ const DisplayApplications = ({ handleApplicationEdit }) => {
     };
 
   const handleRefresh = () => {
+    setLoading(true);
     fetchApplications();
   };
 
@@ -101,23 +107,25 @@ const DisplayApplications = ({ handleApplicationEdit }) => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{ padding: '0.5rem' }}>
       <Title level={2}>
         Available Applications
         <div>
           <Button onClick={handleRefresh}>Refresh</Button>
         </div>
       </Title>
-      {applications.length > 0 ? (
+      {loading ? (<Skeleton active />)
+      : (applications.length > 0 ? (
         <Table
           dataSource={applications}
           columns={columns}
           rowKey={(record) => record.applicationId}
           bordered
+          scroll={{x:'300px'}}
         />
       ) : (
         <Text>No applications available at the moment.</Text>
-      )}
+      ))}
     </div>
   );
 };

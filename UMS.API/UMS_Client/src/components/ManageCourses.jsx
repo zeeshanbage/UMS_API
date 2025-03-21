@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { Input, Button, Typography, Space, Table, message } from 'antd';
-import { insertCourse } from '../services/courseService'; // API service
+import { Input, Button, Typography, Space, App, Upload } from 'antd';
+import { insertCourse } from '../services/courseService';
+import { uploadFile, deleteFile } from '../services/supabaseClient';
+import { InboxOutlined, PlusOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
+const { Dragger } = Upload;
+const { message } = App.useApp();
 
-const ManageCourses = ({iniCourse}) => {
+
+const ManageCourses = ({ iniCourse }) => {
   const [course, setCourse] = useState(iniCourse);
+  const [fileList, setFileList] = useState([]);
 
 
   const handleAddAcademicYear = () => {
-    if(course.academicYears.length<4)
-    {
+    if (course.academicYears.length < 4) {
       setCourse((prev) => ({
         ...prev,
         academicYears: [...prev.academicYears, { title: '' }],
@@ -37,16 +42,46 @@ const ManageCourses = ({iniCourse}) => {
 
   const handleInsertCourse = async () => {
     try {
-      await insertCourse(course);
+      insertCourse(course);
       setCourse({ title: '', subtitle: '', imageUrl: '', academicYears: [] });
+      setFileList([]);
+      message.success('Success!');
     } catch (error) {
       console.log('Failed to insert course!');
     }
   };
 
+  const uploadProps = {
+    name: 'file',
+    multiple: false,
+    maxCount: 1,
+    FileList: { fileList },
+    listType: "picture",
+    customRequest: async ({ file, onSuccess, onError }) => {
+      try {
+        const imageUrl = await uploadFile(file);
+        setCourse({ ...course, imageUrl: imageUrl });
+        onSuccess('ok');
+      } catch (error) {
+        onError(error);
+      }
+    },
+    onChange(info) {
+      const { status } = info.file;
+      if (status === 'done') {
+        console.log(`${info.file.name} file uploaded successfully.`);
+      } else if (status === 'error') {
+        console.log(`${info.file.name} file upload failed.`);
+      }
+    },
+
+    onRemove: async (file) => {
+      await deleteFile(file);
+    },
+  };
 
 
-  useEffect(()=> {
+  useEffect(() => {
     setCourse(iniCourse);
   }, [iniCourse]);
 
@@ -74,35 +109,50 @@ const ManageCourses = ({iniCourse}) => {
           </div>
           <div>
             <Text strong>Image URL</Text>
-            <Input
-              value={course.imageUrl}
-              onChange={(e) => setCourse({ ...course, imageUrl: e.target.value })}
-            />
+            <Dragger {...uploadProps}>
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">Click or drag file to this area to upload</p>
+              <p className="ant-upload-hint">
+                Please upload only image, size should be small.
+              </p>
+            </Dragger>
+            <Text strong>Image URL</Text>
+
           </div>
+            <a href={course.imageUrl}> Image URL: {course.imageUrl}</a>
           <div >
             <Text strong>Academic Years</Text>
             <Space direction="vertical" style={{ width: '100%' }}>
               {course.academicYears && course.academicYears.map((year, index) => (
                 <Space key={index} align="baseline" style={{ width: '100%' }}>
-                <Input
-                  placeholder={`Academic Year ${index + 1}`}
-                  value={year.title}
-                  onChange={(e) => handleAcademicYearChange(index, e.target.value)}
-                  style={{ flex: 1 }}
-                />
-                <Button type="primary" danger onClick={() => handleRemoveAcademicYear(index)}>
-                  Remove
-                </Button>
-              </Space>
+                  <Input
+                    placeholder={`Academic Year ${index + 1}`}
+                    value={year.title}
+                    onChange={(e) => handleAcademicYearChange(index, e.target.value)}
+                    style={{ flex: 1 }}
+                  />
+                  <Button type="primary" danger onClick={() => handleRemoveAcademicYear(index)}>
+                    Remove
+                  </Button>
+                </Space>
               ))}
               <Button type="primary" onClick={handleAddAcademicYear}>
                 Add Year
               </Button>
             </Space>
           </div>
-          <Button type="primary" onClick={handleInsertCourse}>
-            Save Course
-          </Button>
+
+          <Popconfirm
+            title="Delete the task"
+            description="Are you sure to delete this task?"
+            okText="Ok"
+          >
+            <Button type="primary" onClick={handleInsertCourse}>
+              Save Course
+            </Button>
+          </Popconfirm>
         </Space>
       </div>
     </div>
