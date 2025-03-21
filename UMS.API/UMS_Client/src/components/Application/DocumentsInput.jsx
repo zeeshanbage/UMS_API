@@ -36,7 +36,7 @@ function DocumentsInput({ setDocumentValue }) {
             updatedDocuments[index] = { ...updatedDocuments[index], [field]: value };
             return updatedDocuments;
         });
-        const jsonString = JSON.stringify(documentsInput, null);
+        const jsonString = JSON.stringify(documentsInput);
         setDocumentValue('Documents', jsonString);
     }
 

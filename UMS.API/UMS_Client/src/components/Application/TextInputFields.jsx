@@ -33,7 +33,7 @@ function TextInputFields({ setInputFieldsValue }) {
             updatedFields[index] = { ...updatedFields[index], [field]: value };
             return updatedFields;
         });
-        const jsonString = JSON.stringify(textFields, null, 2);
+        const jsonString = JSON.stringify(textFields);
         setInputFieldsValue('TextInputFields', jsonString);
     }
 
