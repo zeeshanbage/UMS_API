@@ -8,17 +8,16 @@ const folderName = 'adminData';
 const BucketName = 'ums-docs-dev';
 export const uploadFile = async (file) => {
     console.log('uploading file ', file.name);
-
     const { data, error } = await supabase.storage
       .from(BucketName)
-      .upload(`${folderName}/${file.name}`, file);
+      .upload(`${folderName}/${file.uid+file.name}`, file);
   
     if (error) {
       console.error('Error uploading file:', error.message);
-      return false;
+      return "false";
     } else {
       console.log('File uploaded successfully:');
-      const publicURL = `${supabaseUrl}/storage/v1/object/${BucketName}/${folderName}/${file.name}`
+      const publicURL = `${supabaseUrl}/storage/v1/object/${BucketName}/${folderName}/${file.uid+file.name}`
       return publicURL;
     }
   };
@@ -28,7 +27,7 @@ export const uploadFile = async (file) => {
        console.log('removing file ', file.name);
       const { data, error } = await supabase.storage
         .from(BucketName)
-        .remove([`${folderName}/${file.name}`]);
+        .remove([`${folderName}/${file.uid+file.name}`]);
   
       if (error) {
         console.error('Error deleting file:', error.message);
