@@ -21,6 +21,8 @@ const initialApplicationState = {
 };
 
 const ManageApplications = ({ initialApplication = initialApplicationState }) => {
+      const [messageApi, contextHolder] = message.useMessage();
+
     const [courseDropdown, setCourseDropdown] = useState([]);
     const [yearDropdown, setYearDropdown] = useState([]);
     const [showError, setShowError] = useState(false);
@@ -89,7 +91,8 @@ const ManageApplications = ({ initialApplication = initialApplicationState }) =>
         try {
             if (application.name === '' || application.courseId === 0 || application.academicYearId === 0) {
                 setShowError(true);
-                return;
+                messageApi.error('Failed to insert application.');
+                return -1;
             }
             if(application.applicationId > 0)
             {
@@ -98,10 +101,10 @@ const ManageApplications = ({ initialApplication = initialApplicationState }) =>
             }
             const response = await insertApplication(application);
             setApplication(initialApplicationState); // Reset the form
-            message.success('Application inserted successfully.');
+            messageApi.success('Form Created successfully.');
         } catch (error) {
             console.error("Error inserting application:", error);
-            message.error('Failed to insert application.');
+            messageApi.error('Failed to insert application.');
         }
     };
 
@@ -136,6 +139,7 @@ const ManageApplications = ({ initialApplication = initialApplicationState }) =>
 
     return (
         <div style={{ marginBottom: "24px", padding: "0.5rem", border: "1px solid #f0f0f0", borderRadius: "8px" }}>
+            {contextHolder}
             <Title level={3}>Create Application</Title>
             <Space direction="vertical" style={{ width: "100%" }} size="large">
                 {/* Course and Year Dropdowns */}

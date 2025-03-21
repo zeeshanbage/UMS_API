@@ -25,11 +25,14 @@ const DisplayApplications = ({ handleApplicationEdit }) => {
     const handleApplicationDelete = async (applicationId) => {
       try {
         console.log(applicationId);
+        setLoading(true);
         await deleteApplication(applicationId);
         setApplications(applications.filter(app => app.applicationId != applicationId));
+        setLoading(false);
       } catch (error) {
         console.log('Failed to delete course!', error);
         handleRefresh();
+        setLoading(false);
       }
     };
 

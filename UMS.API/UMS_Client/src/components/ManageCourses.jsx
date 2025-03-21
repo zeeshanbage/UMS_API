@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Input, Button, Typography, Space, App, Upload } from 'antd';
+import { Input, Button, Typography, Space, App, Upload, message } from 'antd';
 import { insertCourse } from '../services/courseService';
 import { uploadFile, deleteFile } from '../services/supabaseClient';
 import { InboxOutlined, PlusOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 const { Dragger } = Upload;
-const { message } = App.useApp();
-
 
 const ManageCourses = ({ iniCourse }) => {
+  const [messageApi, contextHolder] = message.useMessage();
+
   const [course, setCourse] = useState(iniCourse);
   const [fileList, setFileList] = useState([]);
 
@@ -42,6 +42,10 @@ const ManageCourses = ({ iniCourse }) => {
 
   const handleInsertCourse = async () => {
     try {
+      if (course.title == '') {
+        messageApi.error('Title is empty');
+        return -1;
+      }
       insertCourse(course);
       setCourse({ title: '', subtitle: '', imageUrl: '', academicYears: [] });
       setFileList([]);
@@ -87,6 +91,7 @@ const ManageCourses = ({ iniCourse }) => {
 
   return (
     <div style={{ padding: '1rem' }}>
+      {contextHolder}
       <Title level={2}>Course Management</Title>
 
       {/* Create Course Section */}
@@ -121,7 +126,7 @@ const ManageCourses = ({ iniCourse }) => {
             <Text strong>Image URL</Text>
 
           </div>
-            <a href={course.imageUrl}> Image URL: {course.imageUrl}</a>
+          <Text italic> Image URL: {course.imageUrl}</Text>
           <div >
             <Text strong>Academic Years</Text>
             <Space direction="vertical" style={{ width: '100%' }}>
@@ -144,15 +149,9 @@ const ManageCourses = ({ iniCourse }) => {
             </Space>
           </div>
 
-          <Popconfirm
-            title="Delete the task"
-            description="Are you sure to delete this task?"
-            okText="Ok"
-          >
-            <Button type="primary" onClick={handleInsertCourse}>
-              Save Course
-            </Button>
-          </Popconfirm>
+          <Button type="primary" onClick={handleInsertCourse}>
+            Save Course
+          </Button>
         </Space>
       </div>
     </div>

@@ -27,12 +27,15 @@ const DisplayCourses = ({ handleCourseEdit }) => {
 
   const handleDeleteCourse = async (courseId) => {
     try {
+      setLoading(true);
       console.log(courseId);
       await deleteCourse(courseId);
       setCourses(courses.filter(course => course.courseId !== courseId));
+      setLoading(false);
     } catch (error) {
       console.log('Failed to delete course!', error);
       handleRefresh();
+      setLoading(false);
     }
   };
 
