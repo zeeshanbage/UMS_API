@@ -50,6 +50,13 @@
             })
             .WithOpenApi()
             .WithTags("Admin");
+
+            adminGroup.MapPost("/SaveFormData", async (CourseService courseService, SubmittedForm form) =>
+            {
+                return await courseService.InsertUserForm(form);
+            })
+            .WithOpenApi()
+            .WithTags("Admin");
         }
     }
 }

@@ -213,7 +213,26 @@ public class CourseService
         };
 
         return await _dbConnector.ExecuteAsync(query, parameters);
-    } 
+    }
+
+    public async Task<int> InsertUserForm(SubmittedForm submittedForm)
+    {
+        const string query = @"
+        INSERT INTO public.SubmittedForms (userId, formId, DocumentsData, textInputFieldsData)
+        VALUES (@UserId, @FormId, @Documents, @TextInputFields)
+        RETURNING SubmittedFormId";
+
+        var parameters = new
+        {
+            submittedForm.UserId,
+            submittedForm.FormId,
+            submittedForm.Documents,
+            submittedForm.TextInputFields,
+        };
+        return await _dbConnector.ExecuteScalarAsync<int>(query, parameters);
+    }
+
+
     #endregion
 
 

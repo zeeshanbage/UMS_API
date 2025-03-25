@@ -53,4 +53,13 @@
         public int ApplicationId { get; set; }
 
     }
+
+    public class SubmittedForm
+    {
+        public required string UserId { get; set; }
+        public int FormId { get; set; }
+
+        public string? Documents { get; set; }
+        public string? TextInputFields { get; set; }
+    }
 }
