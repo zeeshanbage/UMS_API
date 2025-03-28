@@ -184,19 +184,6 @@ const ManageApplications = ({ initialApplication = initialApplicationState }) =>
                         onChange={(e) => setApplication({ ...application, subtitle: e.target.value })}
                     />
                 </div>
-                <div>
-                    <Text strong>Image</Text>
-                    <Dragger {...uploadProps}>
-                        <p className="ant-upload-drag-icon">
-                            <InboxOutlined />
-                        </p>
-                        <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                        <p className="ant-upload-hint">
-                            Please upload only image, size should be small.
-                        </p>
-                    </Dragger>
-                    <Text italic>{application.imageURL}</Text>
-                </div>
                 <div style={{ border: '1px solid #d9d9d9', padding: '0.5rem', borderRadius: '10px' }}>
                     <DocumentsInput setDocumentValue={handleDynamicFormInput} />
                 </div>
@@ -205,6 +192,13 @@ const ManageApplications = ({ initialApplication = initialApplicationState }) =>
                 </div>
                 <div>
                     {/* <DropdownInputFields setDropdownValue={handleDynamicFormInput}/> */}
+                </div>
+                <div>
+                    <Text strong>Image</Text>
+                    <Button style={{ marginLeft: '10px' }} type="primary" icon={<UploadOutlined />}>
+                        Upload
+                    </Button>
+                    <Text italic>{application.imageURL}</Text>
                 </div>
                 <div>
                     {showError && (<Alert

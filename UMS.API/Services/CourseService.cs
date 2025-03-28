@@ -214,12 +214,39 @@ public class CourseService
 
         return await _dbConnector.ExecuteAsync(query, parameters);
     }
+    #endregion
 
+
+    #region SubmittedForms
+    public async Task<List<SubmittedForm>> GetSubmittedForms(string userId, int formId)
+    {
+        const string query = @"
+        SELECT sf.*,
+        c.Title AS CourseTitle,
+        ay.Title AS AcademicYearTitle
+        FROM public.SubmittedForms sf
+        LEFT JOIN Applications a
+            ON a.applicationId = sf.formid
+        LEFT JOIN public.Courses c
+            ON c.CourseId = a.CourseId
+        LEFT JOIN public.AcademicYear ay
+            ON ay.academicyearId= a.academicyearId
+        WHERE (@UserId='' OR userId=@UserId)
+        AND (@FormId=0 OR formId=@FormId)
+        order by SubmittedFormId DESC
+        ";
+
+        var parameters = new { UserId = userId, FormId = formId };
+
+
+        var result = await _dbConnector.QueryMultipleRows<SubmittedForm>(query, parameters);
+        return result.ToList();
+    }
     public async Task<int> InsertUserForm(SubmittedForm submittedForm)
     {
         const string query = @"
-        INSERT INTO public.SubmittedForms (userId, formId, DocumentsData, textInputFieldsData)
-        VALUES (@UserId, @FormId, @Documents, @TextInputFields)
+        INSERT INTO public.SubmittedForms (userId, formId, DocumentsData, textInputFieldsData, status)
+        VALUES (@UserId, @FormId, @Documents, @textinputfieldsdata, @Status)
         RETURNING SubmittedFormId";
 
         var parameters = new
@@ -227,69 +254,11 @@ public class CourseService
             submittedForm.UserId,
             submittedForm.FormId,
             submittedForm.Documents,
-            submittedForm.TextInputFields,
+            textinputfieldsdata = submittedForm.TextInputData,
+            submitted_date = DateTime.Now,
+            submittedForm.Status,
         };
         return await _dbConnector.ExecuteScalarAsync<int>(query, parameters);
     }
-
-
     #endregion
-
-
-    #region NotRequired Now
-    internal async Task<int> InsertDynamicForm(DynamicForm dynamicForm)
-    {
-        const string query = @"
-        INSERT INTO public.DynamicForms (name, documents, textInputFields, dropDownFields, applicationId)
-        VALUES (@Name, @Documents, @TextInputFields, @DropDownFields, @ApplicationId)
-        RETURNING FormId;";
-
-        var parameters = new
-        {
-            dynamicForm.Name,
-            dynamicForm.Documents,
-            dynamicForm.TextInputFields,
-            dynamicForm.DropDownFields,
-            dynamicForm.ApplicationId,
-        };
-        return await _dbConnector.ExecuteScalarAsync<int>(query, parameters);
-    }
-
-    internal async Task<int> DeleteDynamicForm(int formId)
-    {
-        const string query = @"
-        DELETE FROM public.DynamicForms
-        WHERE FormId=@FormId";
-
-        var parameters = new
-        {
-            FormId = formId
-        };
-        return await _dbConnector.ExecuteAsync(query, parameters);
-    }
-
-    internal async Task<DynamicForm> GetDynamicForm(int applicationId)
-    {
-        string query = @"
-        SELECT 
-        FormId,
-        Name,
-        Documents,
-        textInputFields,
-        dropDownFields,
-        applicationId
-        FROM public.DynamicForms
-        WHERE ApplicationId=@ApplicationId";
-
-        var parameters = new
-        {
-            ApplicationId = applicationId
-        };
-
-        var result = await _dbConnector.QueryMultipleRows<DynamicForm>(query, parameters);
-        return result.FirstOrDefault();
-    }
-
-    #endregion
-
 }

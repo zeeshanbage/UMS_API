@@ -22,7 +22,7 @@ function DocumentsInput({ setDocumentValue }) {
     ])
 
     const addDocument = () => {
-        setDocumentsInput([...documentsInput, { name: '', isRequired: false, type: 'pdf' }]);
+        setDocumentsInput([...documentsInput, { name: '', isRequired: false, type: 'any' }]);
     };
 
     const removeDocument = (index) => {

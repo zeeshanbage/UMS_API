@@ -9,13 +9,9 @@ function TextInputFields({ setInputFieldsValue }) {
 
 
     const [textFields, setTextFields] = useState([{
-        name: "Full Name",
-        isRequired: "checked"
-    },
-    {
-        name: "Mobile Number",
+        name: "",
         isRequired: false
-    },
+    }
     ])
 
     const addTextField = () => {
@@ -46,8 +42,9 @@ function TextInputFields({ setInputFieldsValue }) {
                     <Input
                         value={doc.name}
                         onChange={(e) => handleTextInputFieldChange(index, 'name', e.target.value)}
+                        placeholder= 'Full Name, Mobile Number'
                     />
-                    <Checkbox checked={doc.isRequired} onChange={(e) => handleTextInputFieldChange(index, 'isRequired', e.target.value)}>Required</Checkbox>
+                    <Checkbox checked={doc.isRequired} onChange={(e) => handleTextInputFieldChange(index, 'isRequired', e.target.checked)}>Required</Checkbox>
                     <Button type="primary" danger onClick={() => removeTextField(index)}>
                         Remove
                     </Button>

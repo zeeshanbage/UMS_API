@@ -112,20 +112,6 @@ const ManageCourses = ({ iniCourse }) => {
               onChange={(e) => setCourse({ ...course, subtitle: e.target.value })}
             />
           </div>
-          <div>
-            <Text strong>Image URL</Text>
-            <Dragger {...uploadProps}>
-              <p className="ant-upload-drag-icon">
-                <InboxOutlined />
-              </p>
-              <p className="ant-upload-text">Click or drag file to this area to upload</p>
-              <p className="ant-upload-hint">
-                Please upload only image, size should be small.
-              </p>
-            </Dragger>
-            <Text strong>Image URL</Text>
-
-          </div>
           <Text italic> Image URL: {course.imageUrl}</Text>
           <div >
             <Text strong>Academic Years</Text>
@@ -147,6 +133,20 @@ const ManageCourses = ({ iniCourse }) => {
                 Add Year
               </Button>
             </Space>
+          </div>
+          <div>
+            <Text strong>Image URL</Text>
+            <Dragger {...uploadProps}>
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">Click or drag file to this area to upload</p>
+              <p className="ant-upload-hint">
+                Please upload only image, size should be small.
+              </p>
+            </Dragger>
+            <Text strong>Image URL</Text>
+
           </div>
 
           <Button type="primary" onClick={handleInsertCourse}>

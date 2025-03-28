@@ -35,9 +35,9 @@ public static class MobileEndpoints
         .WithOpenApi()
         .WithTags("Mobile");
 
-        mobileGroup.MapGet("/GetDynamicForm", async (CourseService courseService, int applicationId) =>
+        mobileGroup.MapGet("/GetSubmittedForms", async (CourseService courseService, string userId = "", int formId = 0) =>
         {
-            return await courseService.GetDynamicForm(applicationId);
+            return await courseService.GetSubmittedForms(userId, formId);
         })
         .WithOpenApi()
         .WithTags("Mobile");

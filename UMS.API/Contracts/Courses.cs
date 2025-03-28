@@ -60,6 +60,11 @@
         public int FormId { get; set; }
 
         public string? Documents { get; set; }
-        public string? TextInputFields { get; set; }
+        public string? TextInputData { get; set; }
+
+        public string? Status {  get; set; }
+
+        public string? CourseTitle { get; set; }
+        public string? academicYearTitle { get; set; }
     }
 }
