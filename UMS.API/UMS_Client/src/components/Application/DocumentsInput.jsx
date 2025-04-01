@@ -52,7 +52,7 @@ function DocumentsInput({ setDocumentValue }) {
                         onChange={(e) => handleDocumentInputChange(index, 'name', e.target.value)}
                     />
                     <Select options={DocumentsTypes} onChange={(value) => handleDocumentInputChange(index, 'type', value)} value={doc.type}/>
-                    <Checkbox onChange={(e) => handleDocumentInputChange(index, 'isRequired', e.target.checked)}>Required</Checkbox>
+                    {/* <Checkbox onChange={(e) => handleDocumentInputChange(index, 'isRequired', e.target.checked)}>Required</Checkbox> */}
                     <Button type="primary" danger onClick={() => removeDocument(index)}>
                         Remove
                     </Button>

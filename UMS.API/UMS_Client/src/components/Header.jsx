@@ -6,7 +6,8 @@ const { Header } = Layout;
 
 const items = [
     { key: '1', label: 'Courses' },
-    { key: '2', label: 'Forms' }
+    { key: '2', label: 'Create Form' },
+    { key: '3', label: 'Submitted Forms'},
 ];
 
 function UMSHeader() {
@@ -17,17 +18,27 @@ function UMSHeader() {
     const navigate = useNavigate();
     const location = useLocation(); // Hook to get the current location
 
-    // Determine the selected key based on the current path
-    const selectedKey = location.pathname === '/forms' ? '2' : '1';
+    const selectedKey = () => {
+        // Determine the selected key based on the current path
+        switch(location.pathname === '/forms')
+        {
+            case '/forms': return 2;
+            case '/course' : return 1;
+            case '/' : return 3;
+        };
+    }
 
     function onSelectItem(event) {
         let path = '/';
         switch (event.key) {
             case '1':
-                path = '/';
+                path = '/course';
                 break;
             case '2':
                 path = '/forms';
+                break;
+            case '3':
+                path = '/';
                 break;
             default:
                 break;
@@ -55,7 +66,7 @@ function UMSHeader() {
                 <Menu
                     theme="dark"
                     mode="horizontal"
-                    selectedKeys={[selectedKey]} // Use selectedKeys instead of defaultSelectedKeys
+                    selectedKeys={selectedKey} // Use selectedKeys instead of defaultSelectedKeys
                     items={items}
                     style={{ flex: 1, minWidth: '30px', right:'10px' }}
                     onSelect={onSelectItem}

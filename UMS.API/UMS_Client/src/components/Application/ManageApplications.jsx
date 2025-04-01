@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Upload, Input, Button, Typography, Space, Select, message, Checkbox, Alert } from "antd";
+import { Upload, Input, Button, Typography, Space, Select, message, Checkbox, Alert, Modal } from "antd";
 
 import { insertApplication, getCourses, deleteApplication } from "../../services/courseService";
 import DocumentsInput from "./DocumentsInput";
@@ -184,11 +184,12 @@ const ManageApplications = ({ initialApplication = initialApplicationState }) =>
                         onChange={(e) => setApplication({ ...application, subtitle: e.target.value })}
                     />
                 </div>
+                <div>
+                    <TextInputFields setInputFieldsValue={handleDynamicFormInput} />
+                </div>
+
                 <div style={{ border: '1px solid #d9d9d9', padding: '0.5rem', borderRadius: '10px' }}>
                     <DocumentsInput setDocumentValue={handleDynamicFormInput} />
-                </div>
-                <div style={{ border: '1px solid #d9d9d9', padding: '0.5rem', borderRadius: '10px' }}>
-                    <TextInputFields setInputFieldsValue={handleDynamicFormInput} />
                 </div>
                 <div>
                     {/* <DropdownInputFields setDropdownValue={handleDynamicFormInput}/> */}

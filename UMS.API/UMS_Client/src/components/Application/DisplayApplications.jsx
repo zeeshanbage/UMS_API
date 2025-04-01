@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { getApplications, deleteApplication} from '../../services/courseService';
-import { Table, Typography, Space, Button, Skeleton } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { getApplications, deleteApplication } from '../../services/courseService';
+import { Table, Typography, Space, Button, Skeleton, Modal } from 'antd';
+import { EditOutlined, DeleteOutlined, BookOutlined } from '@ant-design/icons';
+import ViewFormModal from './viewSingleForm';
 
 const { Title, Text } = Typography;
 
 const DisplayApplications = ({ handleApplicationEdit }) => {
   const [applications, setApplications] = useState([]);
+  const [viewForm, setViewForm] = useState({});
+  const [showViewModal, setShowViewModal] = useState(false);
   const [loading, setLoading] = useState(true); // Add loading state
-  
+
 
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const response = await getApplications(); 
+      const response = await getApplications();
       setLoading(false);
       setApplications(response.data);
     } catch (error) {
@@ -22,24 +25,34 @@ const DisplayApplications = ({ handleApplicationEdit }) => {
     }
   };
 
-    const handleApplicationDelete = async (applicationId) => {
-      try {
-        console.log(applicationId);
-        setLoading(true);
-        await deleteApplication(applicationId);
-        setApplications(applications.filter(app => app.applicationId != applicationId));
-        setLoading(false);
-      } catch (error) {
-        console.log('Failed to delete course!', error);
-        handleRefresh();
-        setLoading(false);
-      }
-    };
+  const handleApplicationDelete = async (applicationId) => {
+    try {
+      console.log(applicationId);
+      setLoading(true);
+      await deleteApplication(applicationId);
+      setApplications(applications.filter(app => app.applicationId != applicationId));
+      setLoading(false);
+    } catch (error) {
+      console.log('Failed to delete course!', error);
+      handleRefresh();
+      setLoading(false);
+    }
+  };
+
+  const handleViewApplication = async (app) => {
+    console.log(app);
+    setViewForm(app);
+    setShowViewModal(true);
+  }
 
   const handleRefresh = () => {
     setLoading(true);
     fetchApplications();
   };
+
+  const handleOk = () => {
+    setShowViewModal(false);
+  }
 
   // Fetch applications from the API
   useEffect(() => {
@@ -89,6 +102,13 @@ const DisplayApplications = ({ handleApplicationEdit }) => {
         <Space direction="vertical">
           <Button
             type="primary"
+            style={{ width: '80%' }}
+            icon={<BookOutlined />}
+            onClick={() => handleViewApplication(record)}
+          >
+            View
+          </Button>
+          <Button
             icon={<EditOutlined />}
             style={{ width: '80%' }}
             onClick={() => handleApplicationEdit(record)}
@@ -118,17 +138,24 @@ const DisplayApplications = ({ handleApplicationEdit }) => {
         </div>
       </Title>
       {loading ? (<Skeleton active />)
-      : (applications.length > 0 ? (
-        <Table
-          dataSource={applications}
-          columns={columns}
-          rowKey={(record) => record.applicationId}
-          bordered
-          scroll={{x:'300px'}}
-        />
-      ) : (
-        <Text>No applications available at the moment.</Text>
-      ))}
+        : (applications.length > 0 ? (
+          <Table
+            dataSource={applications}
+            columns={columns}
+            rowKey={(record) => record.applicationId}
+            bordered
+            scroll={{ x: '300px' }}
+          />
+        ) : (
+          <Text>No applications available at the moment.</Text>
+        ))}
+
+      <ViewFormModal
+        viewForm={viewForm}
+        showViewModal={showViewModal}
+        handleOk={handleOk}
+      />
+
     </div>
   );
 };

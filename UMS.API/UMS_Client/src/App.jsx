@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css"; // Import the CSS file
 import CourseComponent from "./components/CourseComponent";
 import ApplicationComponent from "./components/Application/ApplicationComponent";
+import DisplayAllForms from "./components/SubmittedForms/DisplayAllForms";
+import SubmittedFormView from "./components/SubmittedForms/SubmittedFormView";
 
 function App() {
 
@@ -34,9 +36,11 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<UMSLayout />}>
-          <Route index element={<CourseComponent />} />
+          <Route index element={<DisplayAllForms />} />
+          <Route path="course" element={<CourseComponent />} />
           <Route path="forms" element={<ApplicationComponent />} />
           <Route path="*" element={<ApplicationComponent />} />
+          <Route path="submittedForm" element={<SubmittedFormView />} />
         </Route>
       </Routes>
     </BrowserRouter>

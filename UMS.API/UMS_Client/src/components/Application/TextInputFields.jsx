@@ -35,16 +35,16 @@ function TextInputFields({ setInputFieldsValue }) {
 
     return (
         <>
-            <Text strong>Text fields required for filling this form</Text>
+            <Text strong>Information fields required for filling this form</Text>
             {textFields.map((doc, index) => (
                 <Space key={index} align="baseline" style={{ width: '100%', margin:'10px', flexWrap:'wrap' }}>
-                    <Text style={{}}>Text Field {index+1} </Text>
+                    <Text style={{}}>Field {index+1} </Text>
                     <Input
                         value={doc.name}
                         onChange={(e) => handleTextInputFieldChange(index, 'name', e.target.value)}
                         placeholder= 'Full Name, Mobile Number'
                     />
-                    <Checkbox checked={doc.isRequired} onChange={(e) => handleTextInputFieldChange(index, 'isRequired', e.target.checked)}>Required</Checkbox>
+                    {/* <Checkbox checked={doc.isRequired} onChange={(e) => handleTextInputFieldChange(index, 'isRequired', e.target.checked)}>Required</Checkbox> */}
                     <Button type="primary" danger onClick={() => removeTextField(index)}>
                         Remove
                     </Button>

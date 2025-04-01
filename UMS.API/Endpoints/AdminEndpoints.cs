@@ -53,7 +53,7 @@
 
             adminGroup.MapPost("/SaveFormData", async (CourseService courseService, SubmittedForm form) =>
             {
-                return await courseService.InsertUserForm(form);
+                return await courseService.SubmitForm(form);
             })
             .WithOpenApi()
             .WithTags("Admin");

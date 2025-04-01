@@ -12,3 +12,4 @@ export const insertApplication = (application) => axios.post(`${API_BASE_URL}/In
 export const updateApplication = (application) => axios.post(`${API_BASE_URL}/UpdateApplication`, application);
 export const deleteApplication = (applicationId) => axios.post(`${API_BASE_URL}/DeleteApplication?applicationId=${applicationId}`);
 export const getApplications = () => axios.get(`${API_BASE_URL}/GetApplications`);
+export const getSubmittedForms = () => axios.get(`${API_BASE_URL}/GetSubmittedForms`);

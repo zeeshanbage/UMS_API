@@ -6,6 +6,8 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 const folderName = 'adminData';
 const BucketName = 'ums-docs-dev';
+const PrivateBucketName = 'ums-docs-dev'; //replace later
+
 export const uploadFile = async (file) => {
     console.log('uploading file ', file.name);
     const { data, error } = await supabase.storage
@@ -34,6 +36,36 @@ export const uploadFile = async (file) => {
       } else {
         console.log('File deleted successfully:', data);
       }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  export const DownloadFile = async (fileName) => {
+    try {
+      const { data, error } = await supabase
+        .storage
+        .from(PrivateBucketName)
+        .download(fileName);
+      
+      if (error) {
+        throw error;
+      }
+  
+      console.log('File downloaded successfully:', data);
+  
+      // Create a URL for the downloaded file
+      const url = URL.createObjectURL(data);
+  
+      // Create a temporary anchor element and trigger the download
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName.split('/').pop(); // Use the file name from the path
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+  
+      URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error:', error);
     }

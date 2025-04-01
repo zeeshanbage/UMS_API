@@ -56,15 +56,15 @@
 
     public class SubmittedForm
     {
+        public int SubmittedFormId { get; set; }
         public required string UserId { get; set; }
         public int FormId { get; set; }
-
-        public string? Documents { get; set; }
-        public string? TextInputData { get; set; }
-
+        public required string Name { get; set; }
+        public string? DocumentsData { get; set; }
+        public string? TextInputFieldsData { get; set; }
         public string? Status {  get; set; }
-
         public string? CourseTitle { get; set; }
         public string? academicYearTitle { get; set; }
+        public DateTime? Submitted_Date { get; set;}
     }
 }

@@ -222,6 +222,7 @@ public class CourseService
     {
         const string query = @"
         SELECT sf.*,
+        a.Name,
         c.Title AS CourseTitle,
         ay.Title AS AcademicYearTitle
         FROM public.SubmittedForms sf
@@ -242,19 +243,19 @@ public class CourseService
         var result = await _dbConnector.QueryMultipleRows<SubmittedForm>(query, parameters);
         return result.ToList();
     }
-    public async Task<int> InsertUserForm(SubmittedForm submittedForm)
+    public async Task<int> SubmitForm(SubmittedForm submittedForm)
     {
         const string query = @"
         INSERT INTO public.SubmittedForms (userId, formId, DocumentsData, textInputFieldsData, status)
-        VALUES (@UserId, @FormId, @Documents, @textinputfieldsdata, @Status)
+        VALUES (@UserId, @FormId, @DocumentsData, @TextInputFieldsData, @Status)
         RETURNING SubmittedFormId";
 
         var parameters = new
         {
             submittedForm.UserId,
             submittedForm.FormId,
-            submittedForm.Documents,
-            textinputfieldsdata = submittedForm.TextInputData,
+            submittedForm.DocumentsData,
+            submittedForm.TextInputFieldsData,
             submitted_date = DateTime.Now,
             submittedForm.Status,
         };
